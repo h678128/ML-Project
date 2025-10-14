@@ -9,9 +9,9 @@ import os
 # --- Settings ---
 train_csv = "data/splits/train.csv"
 val_csv = "data/splits/val.csv"
-img_dir = "data/raw/crop_part1"  # juster hvis flere mapper
+img_dir = "data/raw/crop_part1"  
 batch_size = 32
-epochs = 5
+epochs = 1
 lr = 0.001
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -54,3 +54,9 @@ for epoch in range(epochs):
         running_loss += loss.item()
 
     print(f"Epoch {epoch+1}/{epochs}, Loss: {running_loss/len(train_loader):.4f}")
+
+    # --- Save model ---
+os.makedirs("models", exist_ok=True)
+torch.save(model.state_dict(), "models/age_model.pth")
+print("flottings Model saved to models/age_model.pth")
+
