@@ -1,0 +1,56 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader
+from torchvision import transforms, models
+from dataset import AgeDataset
+import os
+
+# --- Settings ---
+train_csv = "data/splits/train.csv"
+val_csv = "data/splits/val.csv"
+img_dir = "data/raw/crop_part1"  # juster hvis flere mapper
+batch_size = 32
+epochs = 5
+lr = 0.001
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# --- Transforms ---
+transform = transforms.Compose([
+    transforms.ToPILImage(),
+    transforms.Resize((128, 128)),
+    transforms.ToTensor()
+])
+
+# --- Datasets ---
+train_dataset = AgeDataset(train_csv, img_dir, transform)
+val_dataset = AgeDataset(val_csv, img_dir, transform)
+
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
+# --- Model (bruk pre-trained resnet18) ---
+model = models.resnet18(pretrained=True)
+model.fc = nn.Linear(model.fc.in_features, 1)  # output = alder
+model = model.to(device)
+
+# --- Loss & optimizer ---
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=lr)
+
+# --- Training loop ---
+for epoch in range(epochs):
+    model.train()
+    running_loss = 0.0
+    for images, labels in train_loader:
+        images = images.to(device)
+        labels = labels.to(device).unsqueeze(1)  # [batch,1]
+
+        optimizer.zero_grad()
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item()
+
+    print(f"Epoch {epoch+1}/{epochs}, Loss: {running_loss/len(train_loader):.4f}")
