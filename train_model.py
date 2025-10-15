@@ -11,7 +11,7 @@ train_csv = "data/splits/train.csv"
 val_csv = "data/splits/val.csv"
 img_dir = "data/raw/crop_part1"  
 batch_size = 32
-epochs = 1
+epochs = 6
 lr = 0.001
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -33,6 +33,12 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 model = models.resnet18(pretrained=True)
 model.fc = nn.Linear(model.fc.in_features, 1)  # output = alder
 model = model.to(device)
+
+# --- Load saved model hvis den er der
+if os.path.exists("models/age_model.pth"):
+    model.load_state_dict(torch.load("models/age_model.pth"))
+    print("great Loaded existing model weights to continue training")
+
 
 # --- Loss & optimizer ---
 criterion = nn.MSELoss()
