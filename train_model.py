@@ -12,7 +12,7 @@ train_csv = "data/splits/train.csv"
 val_csv = "data/splits/val.csv"
 img_dir = "data/raw/crop_part1"  
 batch_size = 32
-epochs = 6
+epochs = 10
 lr = 0.001
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -20,6 +20,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 transform = transforms.Compose([
     transforms.ToPILImage(),
     transforms.Resize((128, 128)),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(brightness=0.3, contrast=0.3),
+    transforms.RandomRotation(10),
     transforms.ToTensor()
 ])
 
