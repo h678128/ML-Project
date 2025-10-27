@@ -17,7 +17,7 @@ model = model.to(device)
 # --- Last inn lagret modell ---
 if os.path.exists(model_path):
     model.load_state_dict(torch.load(model_path))
-    print("glott Loaded trained model")
+    print("flott Loaded trained model")
 else:
     raise FileNotFoundError(f"Trained model not found: {model_path}")
 
@@ -48,4 +48,4 @@ iface = gr.Interface(
 )
 
 # --- Start nettsiden ---
-iface.launch() #endre til share = true så vi kan dele
+iface.launch()

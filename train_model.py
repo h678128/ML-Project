@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import transforms, models
@@ -48,6 +49,7 @@ optimizer = optim.Adam(model.parameters(), lr=lr)
 for epoch in range(epochs):
     model.train()
     running_loss = 0.0
+    running_mae = 0.0
     for images, labels in train_loader:
         images = images.to(device)
         labels = labels.to(device).unsqueeze(1)  # [batch,1]
@@ -57,9 +59,12 @@ for epoch in range(epochs):
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
-        running_loss += loss.item()
 
-    print(f"Epoch {epoch+1}/{epochs}, Loss: {running_loss/len(train_loader):.4f}")
+        running_loss += loss.item()
+        mae = F.l1_loss(outputs, labels)
+        running_mae += mae.item()
+
+    print(f"Epoch {epoch+1}/{epochs}, Loss: {running_loss/len(train_loader):.4f}, MAE: {running_mae/len(train_loader):.4f}")
 
     # --- Save model ---
 os.makedirs("models", exist_ok=True)
