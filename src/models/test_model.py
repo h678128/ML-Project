@@ -45,3 +45,6 @@ with torch.no_grad():
     output = model(img_tensor)
     predicted_age = output.item()
     print(f"Predicted age: {predicted_age:.1f} years")
+
+
+ #python test_model.py --image data/raw/crop_part1/61_1_20170109142408075.jpg kjør i terminal
